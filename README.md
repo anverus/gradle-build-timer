@@ -72,6 +72,7 @@ BUILD SUCCESSFUL in 0s
 
 ```
 ### Prometheus Push
+Configuration
 ```groovy
 buildtiming {
     reporters {
@@ -88,3 +89,23 @@ buildtiming {
     }
 }
 ```
+Reporter publishes two metrics
+Values are time taken (in milliseconds) for given build or tasks
+
+* build_overall_timing pushed with following labels
+
+label name | value
+---------- | -----
+instance | hostname of machine running the build
+job | name of the project
+status | whether build is successful or not
+tasks | list of tasks passed as argument to build
+
+* build_task_timing each executed task is pushed with following labels
+
+label name | value
+---------- | -----
+instance | hostname of machine running the build
+job | name of the project
+name | name of a task
+status | aggregated status of task execution

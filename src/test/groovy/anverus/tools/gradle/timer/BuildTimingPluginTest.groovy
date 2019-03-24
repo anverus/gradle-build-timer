@@ -51,14 +51,16 @@ class BuildTimingPluginTest extends Specification {
         project.pluginManager.apply 'anverus.tools.timer'
 
         when:
-        project.extensions.configure(BuildTimingPluginExtension, new ClosureBackedAction<BuildTimingPluginExtension>(
-                {
-                    reporters {
-                        undefinedReporter {
+        project.extensions.configure(BuildTimingPluginExtension,
+            new ClosureBackedAction<BuildTimingPluginExtension>(
+            {
+                reporters {
+                    undefinedReporter {
 
-                        }
                     }
-                }))
+                }
+            })
+        )
 
         BuildTimingPluginExtension ext = project.extensions.buildtiming
 
