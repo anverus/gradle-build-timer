@@ -2,9 +2,36 @@
 
 This plugin allow to time overall build along with every executed task. It collects this information and reports it at the end of the build using several predefined reporters.
 
-## Reporters
+## Applying plugin
+```groovy
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath 'anverus.tools:gradle-build-timer:0.1-SNAPSHOT'
+    }
+}
+apply plugin: 'anverus.tools.timer'
 
-### TopNTasks
+// Plugin configuration 
+buildtiming {
+       reporters {
+           topNTask {
+               topN = 25
+           }
+       }
+   }
+```
+
+## Reporters
+In order to time the build and tasks one or more reporters should be specified
+
+### Top *n* tasks Reporter
+This reporter outputs timing for tasks sorted by time descending
+Number of tasks shown is controlled by *topN* configuration parameter 
+
 Plugin configuration
 ```groovy
 buildtiming {
@@ -16,7 +43,7 @@ buildtiming {
    }
 ```
 
-Results
+Sample results
 ```text
 |               3,192 |              DID-WORK:EXECUTED | :test
 |               2,123 |              DID-WORK:EXECUTED | :groovydoc
@@ -44,7 +71,11 @@ BUILD SUCCESSFUL in 7s
 12 actionable tasks: 9 executed, 3 up-to-date
 
 ``` 
-### TopNTaskTypes
+### Top *n* task type (by task name) Reporter
+This reporter outputs timing for tasks aggregated by task name sorted by time descending
+Number of output rows is controlled by *topN* configuration parameter
+Used for multi-project builds to see what types of tasks take most of the time 
+
 Plugin configuration
 ```groovy
 buildtiming {
@@ -55,7 +86,7 @@ buildtiming {
     }
 }
 ```
-
+Sample results
 ```text
 |                  17 | groovydoc
 |                  13 | compileTestGroovy
@@ -71,7 +102,7 @@ buildtiming {
 BUILD SUCCESSFUL in 0s
 
 ```
-### Prometheus Push
+### Prometheus PushGateway Reporter
 Configuration
 ```groovy
 buildtiming {
@@ -92,7 +123,7 @@ buildtiming {
 Reporter publishes two metrics
 Values are time taken (in milliseconds) for given build or tasks
 
-* build_overall_timing pushed with following labels
+* build_overall_timing pushed with following labels 
 
 label name | value
 ---------- | -----
@@ -100,6 +131,8 @@ instance | hostname of machine running the build
 job | name of the project
 status | whether build is successful or not
 tasks | list of tasks passed as argument to build
+
+Additional custom labels can be added with buildCustomLabels
 
 * build_task_timing each executed task is pushed with following labels
 
@@ -109,3 +142,5 @@ instance | hostname of machine running the build
 job | name of the project
 name | name of a task
 status | aggregated status of task execution
+
+Additional custom labels can be added with taskCustomLabels
