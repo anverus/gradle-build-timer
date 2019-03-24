@@ -1,0 +1,61 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'groovy'
+    id 'maven-publish'
+    id "com.gradle.plugin-publish" version "0.10.1"
+}
+
+version = '0.1-SNAPSHOT'
+group = "anverus.tools"
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'io.prometheus:simpleclient_pushgateway:0.6.0'
+    implementation 'com.google.guava:guava:27.1-jre'
+
+    testImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
+}
+
+gradlePlugin {
+    plugins {
+        buildTimingPlugin {
+            id = 'anverus.tools.timer'
+            implementationClass = 'anverus.tools.gradle.timer.BuildTimingPlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/anverus/gradle-build-timer'
+    vcsUrl = 'https://github.com/anverus/gradle-build-timer'
+    description = 'Collects gradle build timing information and reports it to various sources'
+    tags = ['timer', 'monitoring']
+
+    plugins {
+        buildTimingPlugin {
+            displayName = 'Gradle Build Time Monitoring plugin'
+        }
+    }
+}
+
+/*
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username "$nexusUsername"
+                password "$nexusPassword"
+            }
+
+            if(project.version.endsWith('-SNAPSHOT')) {
+                url "${nexusUrl}${relativePathSnapshots}"
+            } else {
+                url "${nexusUrl}${relativePathReleases}"
+            }
+        }
+    }
+}
+*/
