@@ -17,12 +17,16 @@ apply plugin: 'anverus.tools.timer'
 
 // Plugin configuration 
 buildtiming {
-       reporters {
-           topNTask {
-               topN = 25
-           }
-       }
+    reporters {
+        // Pick reporters you want to use
+        topNTask {
+            topN = 25
+        }
+        prometheus {
+            pushGatewayHost = 'prometheus-pushgateway'
+        }
    }
+}
 ```
 
 ## Reporters
@@ -35,12 +39,12 @@ Number of tasks shown is controlled by *topN* configuration parameter
 Plugin configuration
 ```groovy
 buildtiming {
-       reporters {
-           topNTask {
-               topN = 25
-           }
-       }
-   }
+    reporters {
+        topNTask {
+            topN = 25
+        }
+    }
+}
 ```
 
 Sample results
