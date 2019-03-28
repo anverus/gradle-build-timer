@@ -14,7 +14,15 @@ buildscript {
     }
 }
 apply plugin: 'anverus.tools.timer'
-
+```
+or use new style 
+```groovy
+plugins {
+    id 'anverus.tools.timer' version '0.1-SNAPSHOT'
+}
+```
+Do not forget to add configuration
+```groovy
 // Plugin configuration 
 buildtiming {
     reporters {
