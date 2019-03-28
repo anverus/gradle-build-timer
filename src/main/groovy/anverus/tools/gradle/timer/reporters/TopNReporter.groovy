@@ -6,14 +6,15 @@ import org.gradle.BuildResult
 import org.gradle.api.logging.Logger
 
 class TopNReporter extends AbstractBuildTimeTrackerReporter<TopNReporterExtension> {
-    TopNReporter(TopNReporterExtension extension, Logger logger) {
-        super(extension, logger)
+    TopNReporter(TopNReporterExtension extension) {
+        super(extension)
     }
 
     @Override
-    run(BuildTiming timings, BuildResult result) {
+    def run(BuildTiming timings, BuildResult result, Logger logger) {
         def limit = reporterExtension.topN > 0 ? reporterExtension.topN : Long.MAX_VALUE // No limit if topN set to 0 or less
 
+        logger.lifecycle('')
         timings.taskTimingMap.values()
             .stream()
             .sorted(Comparator.comparing { it.startTime - it.finishTime })
@@ -30,7 +31,7 @@ class TopNReporterExtension extends ReporterExtension<TopNReporter> {
     }
 
     @Override
-    TopNReporter getReporter(Logger logger) {
-        return new TopNReporter(this, logger)
+    TopNReporter getReporter() {
+        return new TopNReporter(this)
     }
 }

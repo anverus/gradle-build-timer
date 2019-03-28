@@ -1,10 +1,14 @@
 package anverus.tools.gradle.timer
 
 import anverus.tools.gradle.timer.reporters.AbstractBuildTimeTrackerReporter
+import anverus.tools.gradle.timer.reporters.CustomReporters
+import anverus.tools.gradle.timer.reporters.CustomReportersExtension
 import anverus.tools.gradle.timer.reporters.PrometheusReporterExtension
 import anverus.tools.gradle.timer.reporters.ReporterExtension
 import anverus.tools.gradle.timer.reporters.TopNReporterExtension
 import anverus.tools.gradle.timer.reporters.TopNTypeReporterExtension
+import org.gradle.api.logging.Logger
+
 import static com.google.common.base.Preconditions.checkNotNull
 import groovy.transform.builder.Builder
 import groovy.transform.builder.ExternalStrategy
@@ -17,7 +21,6 @@ import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.initialization.Settings
 import org.gradle.api.invocation.Gradle
-import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskState
 
 import java.util.concurrent.ConcurrentHashMap
@@ -26,14 +29,13 @@ class BuildTimingPlugin implements Plugin<Project> {
     def REPORTERS = [
             topNTask: TopNReporterExtension,
             topNType: TopNTypeReporterExtension,
-            prometheus: PrometheusReporterExtension
+            prometheus: PrometheusReporterExtension,
+            customReporters: CustomReportersExtension
     ]
-    Logger logger
     NamedDomainObjectCollection<ReporterExtension> reporterExtensions
 
     @Override
     void apply(Project project) {
-        logger = project.logger
         project.extensions.create("buildtiming", BuildTimingPluginExtension)
 
         reporterExtensions = project.buildtiming.extensions.reporters =
@@ -41,13 +43,13 @@ class BuildTimingPlugin implements Plugin<Project> {
                 { name -> checkNotNull(REPORTERS.get(name),
                     "Reporter Extention for ${name} not found").newInstance(name)})
 
-        project.gradle.addBuildListener(new BuildTimingRecorder(this))
+        project.gradle.addBuildListener(new BuildTimingRecorder(this, project.logger))
     }
 
     List<AbstractBuildTimeTrackerReporter> getReporters() {
         reporterExtensions
             .findAll { it.enabled }
-            .collect { it.getReporter(logger) }
+            .collect { it.getReporter() }
     }
 }
 
@@ -80,10 +82,12 @@ class TaskTimingBuilder {}
 class BuildTimingRecorder implements BuildListener, TaskExecutionListener {
     final BuildTimingPlugin plugin
     final BuildTiming buildTiming
+    final Logger logger
 
-    BuildTimingRecorder(BuildTimingPlugin pPlugin) {
+    BuildTimingRecorder(BuildTimingPlugin pPlugin, Logger pLogger) {
         plugin = pPlugin
         buildTiming = new BuildTiming()
+        logger = pLogger
     }
 
     @Override
@@ -104,7 +108,7 @@ class BuildTimingRecorder implements BuildListener, TaskExecutionListener {
         buildTiming.tasks = buildResult.gradle.startParameter.getTaskNames()
 
         plugin.reporters.each {
-            it.run (buildTiming, buildResult)
+            it.run (buildTiming, buildResult, logger)
         }
     }
 

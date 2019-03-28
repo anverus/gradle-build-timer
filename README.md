@@ -143,4 +143,39 @@ job | name of the project
 name | name of a task
 status | aggregated status of task execution
 
-Additional custom labels can be added with taskCustomLabels
+Additional custom labels can be added with taskCustomLabels.
+
+### Custom reporters
+If you realize that your needs are not covered by provided reporters you can configure your own custom reporter to handle timing results.
+
+Configuration
+```groovy
+buildtiming {
+    reporters {
+        customReporters {
+            reporters = [
+                { anverus.tools.gradle.timer.BuildTiming timings, BuildResult result, Logger logger ->
+                    logger.lifecycle('Hello custom reporter')
+
+                    // Output top 5 tasks 
+                    timings.taskTimingMap.values()
+                        .stream()
+                        // Want to add filters?
+                        .filter { it.name == 'compileJava' }
+                        .filter { it.finishTime - it.startTime > 1000 }
+                        .sorted(Comparator.comparing { it.startTime - it.finishTime })
+                        .limit(5)
+                        .forEach { tt ->
+                            logger.lifecycle (String.format('|%,20d | %10s | %s',
+                                tt.finishTime - tt.startTime,
+                                tt.state.didWork ? 'WORKED' : ((TaskStateInternal)tt.state).fromCache ? 'FROM-CACHE' : tt.state.upToDate ? 'UP-TO-DATE' : 'MEH',
+                                tt.path))
+                        }
+                } as anverus.tools.gradle.timer.TimeTrackerReporter
+            ]
+        }
+    }
+}
+```
+
+And if you are feeling generous and think others can benefit from your contribution submit a pull request to include your reporter into distribution.

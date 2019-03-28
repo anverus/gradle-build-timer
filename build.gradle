@@ -3,6 +3,7 @@ plugins {
     id 'groovy'
     id 'maven-publish'
     id "com.gradle.plugin-publish" version "0.10.1"
+    id 'net.researchgate.release' version '2.6.0'
 }
 
 version = '0.1-SNAPSHOT'
@@ -41,21 +42,22 @@ pluginBundle {
     }
 }
 
-/*
+sourceCompatibility = 8
+targetCompatibility = 8
+
 publishing {
     repositories {
         maven {
             credentials {
-                username "$nexusUsername"
-                password "$nexusPassword"
+                username "${project.findProperty('maven.repo.user')}"
+                password "${project.findProperty('maven.repo.password')}"
             }
 
             if(project.version.endsWith('-SNAPSHOT')) {
-                url "${nexusUrl}${relativePathSnapshots}"
+                url "${project.findProperty('maven.repo.snapshot.url')}"
             } else {
-                url "${nexusUrl}${relativePathReleases}"
+                url "${project.findProperty('maven.repo.release.url')}"
             }
         }
     }
 }
-*/

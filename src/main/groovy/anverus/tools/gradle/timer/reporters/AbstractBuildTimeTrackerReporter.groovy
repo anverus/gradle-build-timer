@@ -1,49 +1,16 @@
 package anverus.tools.gradle.timer.reporters
 
-import anverus.tools.gradle.timer.BuildTiming
-import org.gradle.BuildResult
+import anverus.tools.gradle.timer.TimeTrackerReporter
 import org.gradle.api.internal.tasks.TaskStateInternal
-import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.TaskState
 
-abstract class AbstractBuildTimeTrackerReporter<E extends ReporterExtension<AbstractBuildTimeTrackerReporter<E>>> {
+
+abstract class AbstractBuildTimeTrackerReporter<E extends ReporterExtension<AbstractBuildTimeTrackerReporter<E>>>
+        implements TimeTrackerReporter {
     E reporterExtension
-    Logger logger
 
-    AbstractBuildTimeTrackerReporter(E reporterExtension, Logger logger) {
+    AbstractBuildTimeTrackerReporter(E reporterExtension) {
         this.reporterExtension = reporterExtension
-        this.logger = logger
-    }
-
-
-    abstract run(BuildTiming timings, BuildResult result)
-
-    static String getState(TaskState taskState) {
-        def states = new StringJoiner(':')
-
-        if (taskState.upToDate) {
-            states.add 'UP-TO-DATE'
-        }
-        if (taskState.skipped) {
-            states.add 'SKIPPED'
-        }
-        if (taskState.noSource) {
-            states.add 'NO-SOURCE'
-        }
-        if (taskState.didWork) {
-            states.add 'DID-WORK'
-        }
-        if (taskState.executed) {
-            states.add 'EXECUTED'
-        }
-        if (taskState instanceof TaskStateInternal && ((TaskStateInternal)taskState).isFromCache()) {
-            states.add 'FROM-CACHE'
-        }
-        return states.toString()
-    }
-
-    boolean isEnabled(List<String> tasks) {
-        reporterExtension.enabled && tasks != ["clean"]
     }
 }
 
@@ -56,5 +23,5 @@ abstract class ReporterExtension<R extends AbstractBuildTimeTrackerReporter<Repo
         this.name = name
     }
 
-    abstract R getReporter(Logger logger)
+    abstract R getReporter()
 }

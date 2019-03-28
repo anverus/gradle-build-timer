@@ -9,12 +9,12 @@ import org.gradle.BuildResult
 import org.gradle.api.logging.Logger
 
 class PrometheusReporter extends AbstractBuildTimeTrackerReporter<PrometheusReporterExtension> {
-    PrometheusReporter(PrometheusReporterExtension extension, Logger logger) {
-        super(extension, logger)
+    PrometheusReporter(PrometheusReporterExtension extension) {
+        super(extension)
     }
 
     @Override
-    run(BuildTiming timings, BuildResult result) {
+    def run(BuildTiming timings, BuildResult result, Logger logger) {
         CollectorRegistry registry = new CollectorRegistry()
 
         def hostName = InetAddress.localHost.hostName
@@ -49,7 +49,7 @@ class PrometheusReporter extends AbstractBuildTimeTrackerReporter<PrometheusRepo
         PushGateway pg = new PushGateway(reporterExtension.pushGatewayHost)
         pg.pushAdd(registry, reporterExtension.jobName != null ? reporterExtension.jobName : result.gradle.rootProject.name)
 
-        logger.lifecycle("Pushed build timing to Prometheus host ${reporterExtension.pushGatewayHost}")
+        logger.lifecycle("\nPushed build timing to Prometheus host ${reporterExtension.pushGatewayHost}")
     }
 }
 
@@ -64,8 +64,8 @@ class PrometheusReporterExtension extends ReporterExtension<PrometheusReporter> 
     }
 
     @Override
-    PrometheusReporter getReporter(Logger logger) {
-        return new PrometheusReporter(this, logger)
+    PrometheusReporter getReporter() {
+        return new PrometheusReporter(this)
     }
 }
 
