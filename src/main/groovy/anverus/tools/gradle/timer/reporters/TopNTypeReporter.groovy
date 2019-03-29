@@ -18,7 +18,7 @@ class TopNTypeReporter extends AbstractBuildTimeTrackerReporter<TopNTypeReporter
         logger.lifecycle('\n| ==== Top task types by execution time (millis) ====')
         timings.taskTimingMap.values()
                 .stream()
-                .collect(Collectors.groupingBy({it.name}, Collectors.summingLong({ tt -> (tt.finishTime - tt.startTime)})))
+                .collect(Collectors.groupingBy({it.name}, Collectors.summingLong({ tt -> tt.duration })))
                 .entrySet()
                 .stream()
                 .sorted(Comparator.comparing { -it.value })

@@ -1,7 +1,6 @@
 package anverus.tools.gradle.timer
 
 import anverus.tools.gradle.timer.reporters.AbstractBuildTimeTrackerReporter
-import anverus.tools.gradle.timer.reporters.CustomReporters
 import anverus.tools.gradle.timer.reporters.CustomReportersExtension
 import anverus.tools.gradle.timer.reporters.PrometheusReporterExtension
 import anverus.tools.gradle.timer.reporters.ReporterExtension
@@ -68,12 +67,24 @@ class BuildTiming {
 
     // Task timing by task path
     final Map<String, TaskTiming> taskTimingMap = new ConcurrentHashMap<>()
+
+    long getDuration() {
+        return finishMillis - startMillis
+    }
 }
 
 class TaskTiming {
     String name, path
     TaskState state
     long startTime, finishTime
+
+    long getDuration() {
+        return finishTime - startTime
+    }
+
+    void setDuration(long duration) {
+        // Any better way to allow derived property with builder?
+    }
 }
 
 @Builder(builderStrategy = ExternalStrategy, forClass = TaskTiming)

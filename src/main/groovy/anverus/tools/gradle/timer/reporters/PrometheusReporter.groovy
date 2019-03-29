@@ -15,6 +15,10 @@ class PrometheusReporter extends AbstractBuildTimeTrackerReporter<PrometheusRepo
 
     @Override
     def run(BuildTiming timings, BuildResult result, Logger logger) {
+        if (!(result.gradle.startParameter.taskNames - reporterExtension.skipReportingTasks)) {
+            return
+        }
+
         CollectorRegistry registry = new CollectorRegistry()
 
         def hostName = InetAddress.localHost.hostName
@@ -40,6 +44,7 @@ class PrometheusReporter extends AbstractBuildTimeTrackerReporter<PrometheusRepo
 
         timings.taskTimingMap.values()
             .stream()
+            .filter {taskTiming -> taskTiming.duration >= reporterExtension.taskTimingThresholdMillis}
             .forEach { tt ->
             taskSummary
                 .labels(([hostName, tt.path, tt.name, getState(tt.state)] + reporterExtension.taskCustomLabels.values()).toArray(new String[0]))
@@ -60,8 +65,23 @@ class PrometheusReporter extends AbstractBuildTimeTrackerReporter<PrometheusRepo
 class PrometheusReporterExtension extends ReporterExtension<PrometheusReporter> {
     String pushGatewayHost
     String jobName
+    List<String> skipReportingTasks = [
+            'clean',
+            'buildEnvironment',
+            'components',
+            'dependencies',
+            'dependencyInsight',
+            'dependentComponents',
+            'help',
+            'model',
+            'projects',
+            'properties',
+            'tasks'
+    ]
+
     Map<String, String> buildCustomLabels = [:]
     Map<String, String> taskCustomLabels = [:]
+    long taskTimingThresholdMillis = 0L
 
     PrometheusReporterExtension(String name) {
         super(name)

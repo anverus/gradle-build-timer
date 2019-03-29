@@ -16,9 +16,9 @@ class TopNReporter extends AbstractBuildTimeTrackerReporter<TopNReporterExtensio
         logger.lifecycle('\n|   ===== Top tasks by execution time (millis) =====   |')
         timings.taskTimingMap.values()
             .stream()
-            .sorted(Comparator.comparing { it.startTime - it.finishTime })
+            .sorted(Comparator.comparing { -it.duration })
             .limit(limit)
-            .forEach {tt -> logger.lifecycle (String.format('|%,20d | %30s | %s', tt.finishTime - tt.startTime, getState(tt.state), tt.path))}
+            .forEach {tt -> logger.lifecycle (String.format('|%,20d | %30s | %s', tt.duration, getState(tt.state), tt.path))}
     }
 }
 
