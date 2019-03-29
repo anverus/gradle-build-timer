@@ -87,7 +87,7 @@ if (project.hasProperty('bintray.username') && project.hasProperty('bintray.api.
             vcsUrl = githubProjectUrl
             githubRepo = 'anverus/gradle-build-timer'
             githubReleaseNotesFile = 'README.md'
-            licenses = ['MIT License']
+            licenses = ['MIT']
             publish = false
             version {
                 name = project.version
