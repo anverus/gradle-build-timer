@@ -1,15 +1,19 @@
 plugins {
     id 'java-gradle-plugin'
     id 'groovy'
+    id 'idea'
+    id 'jacoco'
     id 'maven-publish'
     id "com.gradle.plugin-publish" version "0.10.1"
     id 'net.researchgate.release' version '2.6.0'
+    id "com.jfrog.bintray" version "1.+"
 }
 
 version = '0.1-SNAPSHOT'
 group = "anverus.tools"
 
 repositories {
+    mavenLocal()
     jcenter()
 }
 
@@ -18,20 +22,23 @@ dependencies {
     implementation 'com.google.guava:guava:27.1-jre'
 
     testImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
+    testCompile gradleTestKit()
 }
 
-gradlePlugin {
-    plugins {
-        buildTimingPlugin {
-            id = 'anverus.tools.timer'
-            implementationClass = 'anverus.tools.gradle.timer.BuildTimingPlugin'
-        }
-    }
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+tasks.jacocoTestReport.dependsOn test
+tasks.check.dependsOn jacocoTestReport
+
+jacoco {
+    toolVersion = '0.8.3'
 }
 
+def githubProjectUrl = 'https://github.com/anverus/gradle-build-timer'
 pluginBundle {
-    website = 'https://github.com/anverus/gradle-build-timer'
-    vcsUrl = 'https://github.com/anverus/gradle-build-timer'
+    website = githubProjectUrl
+    vcsUrl = githubProjectUrl
     description = 'Collects gradle build timing information and reports it to various sources'
     tags = ['timer', 'monitoring']
 
@@ -42,8 +49,14 @@ pluginBundle {
     }
 }
 
-sourceCompatibility = 8
-targetCompatibility = 8
+gradlePlugin {
+    plugins {
+        buildTimingPlugin {
+            id = 'anverus.tools.timer'
+            implementationClass = 'anverus.tools.gradle.timer.BuildTimingPlugin'
+        }
+    }
+}
 
 publishing {
     repositories {
@@ -61,3 +74,29 @@ publishing {
         }
     }
 }
+
+if (project.hasProperty('bintray.username') && project.hasProperty('bintray.api.key')) {
+    bintray {
+        user = project.findProperty('bintray.username')
+        key = project.findProperty('bintray.api.key')
+
+        configurations = ['archives']
+        pkg {
+            repo = 'maven'
+            name = 'gradle-build-timer'
+            websiteUrl = githubProjectUrl
+            vcsUrl = githubProjectUrl
+            githubRepo = 'anverus/gradle-build-timer'
+            githubReleaseNotesFile = 'README.md'
+            licenses = ['MIT License']
+            publish = false
+            version {
+                name = project.version
+                released = new Date()
+            }
+        }
+    }
+
+//    afterReleaseBuild.dependsOn bintrayUpload
+}
+//    afterReleaseBuild.dependsOn publishPlugins

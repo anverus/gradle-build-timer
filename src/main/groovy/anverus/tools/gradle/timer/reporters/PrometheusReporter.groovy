@@ -47,9 +47,13 @@ class PrometheusReporter extends AbstractBuildTimeTrackerReporter<PrometheusRepo
         }
 
         PushGateway pg = new PushGateway(reporterExtension.pushGatewayHost)
-        pg.pushAdd(registry, reporterExtension.jobName != null ? reporterExtension.jobName : result.gradle.rootProject.name)
 
-        logger.lifecycle("\nPushed build timing to Prometheus host ${reporterExtension.pushGatewayHost}")
+        try {
+            pg.pushAdd(registry, reporterExtension.jobName != null ? reporterExtension.jobName : result.gradle.rootProject.name)
+            logger.lifecycle("\nPushed build timing to Prometheus host ${reporterExtension.pushGatewayHost}")
+        } catch(Throwable t) {
+            logger.warn("Failed to publish Build timing report to prometheus Push Gateway", t)
+        }
     }
 }
 
