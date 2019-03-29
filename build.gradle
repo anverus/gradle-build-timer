@@ -6,7 +6,7 @@ plugins {
     id 'maven-publish'
     id "com.gradle.plugin-publish" version "0.10.1"
     id 'net.researchgate.release' version '2.6.0'
-    id "com.jfrog.bintray" version "1.+"
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 version = '0.1-SNAPSHOT'
