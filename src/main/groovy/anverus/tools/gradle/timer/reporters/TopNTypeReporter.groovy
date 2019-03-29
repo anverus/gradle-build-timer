@@ -15,8 +15,7 @@ class TopNTypeReporter extends AbstractBuildTimeTrackerReporter<TopNTypeReporter
     @Override
     def run(BuildTiming timings, BuildResult result, Logger logger) {
         def limit = reporterExtension.topN > 0 ? reporterExtension.topN : Long.MAX_VALUE // No limit if topN set to 0 or less
-
-        logger.lifecycle('')
+        logger.lifecycle('\n| ==== Top task types by execution time (millis) ====')
         timings.taskTimingMap.values()
                 .stream()
                 .collect(Collectors.groupingBy({it.name}, Collectors.summingLong({ tt -> (tt.finishTime - tt.startTime)})))
