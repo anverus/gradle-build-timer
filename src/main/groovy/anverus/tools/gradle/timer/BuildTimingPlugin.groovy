@@ -8,7 +8,6 @@ import anverus.tools.gradle.timer.reporters.TopNReporterExtension
 import anverus.tools.gradle.timer.reporters.TopNTypeReporterExtension
 import org.gradle.api.logging.Logger
 
-import static com.google.common.base.Preconditions.checkNotNull
 import groovy.transform.builder.Builder
 import groovy.transform.builder.ExternalStrategy
 import org.gradle.BuildListener
@@ -39,8 +38,14 @@ class BuildTimingPlugin implements Plugin<Project> {
 
         reporterExtensions = project.buildtiming.extensions.reporters =
             project.container(ReporterExtension,
-                { name -> checkNotNull(REPORTERS.get(name),
-                    "Reporter Extention for ${name} not found").newInstance(name)})
+                { name ->
+                    if (REPORTERS.get(name) == null) {
+                        throw new NullPointerException("Reporter Extention for ${name} not found")
+                    } else {
+                        REPORTERS.get(name).newInstance(name)
+                    }
+                }
+            )
 
         project.gradle.addBuildListener(new BuildTimingRecorder(this, project.logger))
     }

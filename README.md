@@ -121,13 +121,27 @@ buildtiming {
     reporters {
         prometheus {
             pushGatewayHost = 'prometheus-pushgateway'
-            buildCustomLabels = [
+            buildCustomLabels = [       // add these labels to build_overall_timing metric
                 'type':'local', // ci, release
                 'office': 'needham'
             ]
-            taskCustomLabels = [
+            taskCustomLabels = [            // add these lebels to each task timing metric
                 'jdk': JavaVersion.current
             ]
+            taskTimingThresholdMillis = 50 // skip reporting tasks taking less then 50 milliseconds
+            skipReportingTasks = [         // skip reporting builds consisting any subset of these (help) tasks
+                        'clean',
+                        'buildEnvironment',
+                        'components',
+                        'dependencies',
+                        'dependencyInsight',
+                        'dependentComponents',
+                        'help',
+                        'model',
+                        'projects',
+                        'properties',
+                        'tasks'
+                ]
         }
     }
 }

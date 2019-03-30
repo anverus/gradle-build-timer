@@ -4,9 +4,9 @@ plugins {
     id 'idea'
     id 'jacoco'
     id 'maven-publish'
-    id "com.gradle.plugin-publish" version "0.10.1"
+    id 'com.gradle.plugin-publish' version '0.10.1'
     id 'net.researchgate.release' version '2.6.0'
-    id "com.jfrog.bintray" version "1.8.4"
+    id 'com.jfrog.bintray' version '1.8.4'
 }
 
 group = "anverus.tools"
@@ -18,7 +18,6 @@ repositories {
 
 dependencies {
     implementation 'io.prometheus:simpleclient_pushgateway:0.6.0'
-    implementation 'com.google.guava:guava:27.1-jre'
 
     testImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
     testCompile gradleTestKit()
@@ -27,8 +26,8 @@ dependencies {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-tasks.jacocoTestReport.dependsOn test
-tasks.check.dependsOn jacocoTestReport
+tasks.jacocoTestReport.dependsOn tasks.test
+tasks.check.dependsOn tasks.jacocoTestReport
 
 jacoco {
     toolVersion = '0.8.3'
@@ -58,6 +57,11 @@ gradlePlugin {
 }
 
 publishing {
+    publications {
+        pluginPublication(MavenPublication) {
+            from components.java
+        }
+    }
     repositories {
         maven {
             credentials {
@@ -79,12 +83,13 @@ if (project.hasProperty('bintray.username') && project.hasProperty('bintray.api.
         user = project.findProperty('bintray.username')
         key = project.findProperty('bintray.api.key')
 
-        configurations = ['archives']
+        publications = ['pluginPublication']
         pkg {
             repo = 'maven'
             name = 'gradle-build-timer'
             websiteUrl = githubProjectUrl
-            vcsUrl = githubProjectUrl
+            vcsUrl = "${githubProjectUrl}.git"
+            issueTrackerUrl = "$githubProjectUrl/issues"
             githubRepo = 'anverus/gradle-build-timer'
             githubReleaseNotesFile = 'README.md'
             licenses = ['MIT']
