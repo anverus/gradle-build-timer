@@ -1,4 +1,4 @@
-# Gradle Build Timer Plugin [![Build Status](https://travis-ci.org/anverus/gradle-build-timer.svg?branch=master)](https://travis-ci.org/anverus/gradle-build-timer)  [![Download](https://api.bintray.com/packages/anverus/maven/gradle-build-timer/images/download.svg?version=0.1.2) ](https://bintray.com/anverus/maven/gradle-build-timer/0.1.2/link) 
+# Gradle Build Timer Plugin [![Build Status](https://travis-ci.org/anverus/gradle-build-timer.svg?branch=master)](https://travis-ci.org/anverus/gradle-build-timer)  [![Download](https://api.bintray.com/packages/anverus/maven/gradle-build-timer/images/download.svg?version=0.1.3) ](https://bintray.com/anverus/maven/gradle-build-timer/0.1.3/link) 
 
 This plugin allow to time overall build along with every executed task. It collects this information and reports it at the end of the build using several predefined reporters.
 
