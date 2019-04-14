@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f4497b5ed59446db8f2580b47aae84c0)](https://app.codacy.com/app/anverus/gradle-build-timer?utm_source=github.com&utm_medium=referral&utm_content=anverus/gradle-build-timer&utm_campaign=Badge_Grade_Dashboard)
 # Gradle Build Timer Plugin [![Build Status](https://travis-ci.org/anverus/gradle-build-timer.svg?branch=master)](https://travis-ci.org/anverus/gradle-build-timer)  [![Download](https://api.bintray.com/packages/anverus/maven/gradle-build-timer/images/download.svg?version=0.1.3) ](https://bintray.com/anverus/maven/gradle-build-timer/0.1.3/link) 
 
 This plugin allow to time overall build along with every executed task. It collects this information and reports it at the end of the build using several predefined reporters.
